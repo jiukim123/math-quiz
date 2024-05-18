@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        #quizContainer {
+            margin-top: 50px;
+        }
+        #answerInput {
+            margin-top: 20px;
+            font-size: 18px;
+            padding: 5px;
+        }
+        #submitButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #questionDescription {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        #scoreDisplay {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #congratsMessage {
+            display: none;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        #congratsImage {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+        }
+        #numQuestionsContainer {
+            margin-top: 20px;
+        }
+        .b{
+            font-size: 24px;
+            color : red;
+        }
+    </style>
+</head>
+<body>
+    <div id="quizContainer">
+        <h2>Math Quiz</h2>
+        <div id="scoreDisplay">Score: 0</div>
+        <div id="questionDescription"></div>
+        <input type="text" id="answerInput" placeholder="Enter your answer" onkeypress="submitOnEnter(event)">
+        <button id="submitButton" onclick="checkAnswer()">Submit</button>
+        <div id="congratsMessage">Congratulations! You finished the quiz!</div>
+        <img id="congratsImage" src="https://cdn.pixabay.com/photo/2022/12/18/22/38/celebrations-7664358_1280.png" alt="Congrats Image">
+    </div>
+    <div id="numQuestionsContainer">
+        <label class="b" for="numQuestions"><b>Select the number of questions:</b>  </label>
+        <select id="numQuestions">
+            <option value="1">1</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+        </select>
+        <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let currentQuestion = 0;
+        let totalQuestions = 0;
+        const quizContainer = document.getElementById('quizContainer');
+        const answerInput = document.getElementById('answerInput');
+        const questionDescription = document.getElementById('questionDescription');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const congratsMessage = document.getElementById('congratsMessage');
+        const congratsImage = document.getElementById('congratsImage');
+        const numQuestionsSelect = document.getElementById('numQuestions');
+
+        // Define math questions
+        const questions = [];
+
+        // Function to start the quiz
+        function startQuiz() {
+            score = 0;
+            currentQuestion = 0;
+            totalQuestions = parseInt(numQuestionsSelect.value);
+            congratsMessage.style.display = 'none';
+            congratsImage.style.display = 'none';
+            generateQuestions();
+            displayQuestion();
+        }
+
+        // Generate math questions
+        function generateQuestions() {
+            questions.length = 0; // Clear existing questions
+            for (let i = 0; i < totalQuestions; i++) {
+                let num1 = Math.floor(Math.random() * 10); // Random number between 0 and 9
+                let num2 = Math.floor(Math.random() * 10);
+                let operatorIndex = Math.floor(Math.random() * 3); // Random operator index: 0 (+), 1 (-), 2 (x)
+                let operator, answer;
+                switch (operatorIndex) {
+                    case 0:
+                        operator = '+';
+                        answer = num1 + num2;
+                        break;
+                    case 1:
+                        operator = '-';
+                        answer = num1 - num2;
+                        break;
+                    case 2:
+                        operator = 'x';
+                        answer = num1 * num2;
+                        break;
+                }
+                let problem = num1 + ' ' + operator + ' ' + num2 + ' = ?';
+                questions.push({ problem, answer: answer.toString() });
+            }
+            shuffleArray(questions);
+        }
+
+        // Function to shuffle an array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Function to display current question
+        function displayQuestion() {
+            questionDescription.textContent = questions[currentQuestion].problem;
+            scoreDisplay.textContent = 'Score: ' + score;
+        }
+
+        // Function to check answer
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim();
+            const correctAnswer = questions[currentQuestion].answer;
+            if (userAnswer === correctAnswer) {
+                score++;
+                alert('Correct! Your score: ' + score);
+            } else {
+                alert('Incorrect! The correct answer is ' + correctAnswer + '. Try the next question.');
+            }
+            currentQuestion++;
+            answerInput.value = '';
+            if (currentQuestion < totalQuestions) {
+                displayQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        // Function to end the quiz
+        function endQuiz() {
+            congratsMessage.style.display = 'block';
+            congratsImage.style.display = 'block';
+        }
+
+        // Function to submit answer on pressing Enter key
+        function submitOnEnter(event) {
+            if (event.keyCode === 13) {
+                checkAnswer();
+            }
+        }
+
+        // Function to restart the quiz on pressing Enter key after quiz ends
+        window.addEventListener('keypress', function(event) {
+            if (event.keyCode === 13 && currentQuestion === totalQuestions) {
+                startQuiz();
+            }
+        });
+    </script>
+</body>
+</html>
